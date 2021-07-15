@@ -18,11 +18,11 @@ interface FoodProps {
 
 function Dashboard(){
 
-    const { foods, handleAddFood, handleUpdateFood, handleDeleteFood } = useFoods()
+    const { foods, editingFood, setEditingFood, handleAddFood, 
+            handleUpdateFood, handleDeleteFood } = useFoods()
 
     const [modalOpen, setModalOpen] = useState(false)
     const [editModalOpen, setEditModalOpen] = useState(false)
-    const [editingFood, setEditingFood] = useState({} as FoodProps)
 
     function toggleModal(){
       setModalOpen(!modalOpen)

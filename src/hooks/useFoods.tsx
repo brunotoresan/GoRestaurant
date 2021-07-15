@@ -19,9 +19,11 @@ interface FoodProviderProps {
 }
 
 interface FoodsContextData {
-    foods: Food[]
-    handleAddFood: (newFood: FoodInput) => Promise<void>
-    handleUpdateFood: (food: Food, editingFood: Food) => Promise<void>
+    foods: Food[],
+    editingFood: Food,
+    setEditingFood: (food: Food) => void
+    handleAddFood: (newFood: FoodInput) => Promise<void>,
+    handleUpdateFood: (food: Food) => Promise<void>,
     handleDeleteFood: (id: number ) => Promise<void>
 }
 
@@ -32,6 +34,7 @@ const FoodsContext = createContext<FoodsContextData>(
 
 export function FoodsProvider({ children }: FoodProviderProps){
     const [foods, setFoods] = useState<Food[]>([])
+    const [editingFood, setEditingFood] = useState({} as Food)
 
     useEffect(() =>  {
         async function loadFoods() {
@@ -60,7 +63,7 @@ export function FoodsProvider({ children }: FoodProviderProps){
         }       
     }
 
-    async function handleUpdateFood(food: Food, editingFood: Food) {
+    async function handleUpdateFood(food: Food) {
         try {
           const updatedFood = await api.put(
             `/foods/${editingFood.id}`,
@@ -85,7 +88,8 @@ export function FoodsProvider({ children }: FoodProviderProps){
 
     return (
         <FoodsContext.Provider 
-            value={ {foods, handleAddFood, handleUpdateFood, handleDeleteFood} }
+            value={ { foods, editingFood, setEditingFood, handleAddFood, 
+              handleUpdateFood, handleDeleteFood } }
         >
             {children}
         </FoodsContext.Provider>

@@ -52,11 +52,10 @@ export function FoodsProvider({ children }: FoodProviderProps){
                 ...newFood,
                 available: true
             })
-            const { food } = response.data
-    
+            
             setFoods([
                 ...foods,
-                food
+                response.data
             ])            
         } catch(error) {
             console.log(error);

@@ -13,89 +13,89 @@ interface Food {
 type FoodInput = Omit<Food, 'id' | 'available'>
 
 interface FoodProviderProps {
-    // accepts all valid React data (e.g. jsx, html, text,...)
-    // this enables the component FoodsProvider to have children elements
-    children: ReactNode
+  // accepts all valid React data (e.g. jsx, html, text,...)
+  // this enables the component FoodsProvider to have children elements
+  children: ReactNode
 }
 
 interface FoodsContextData {
-    foods: Food[],
-    editingFood: Food,
-    setEditingFood: (food: Food) => void
-    handleAddFood: (newFood: FoodInput) => Promise<void>,
-    handleUpdateFood: (food: Food) => Promise<void>,
-    handleDeleteFood: (id: number ) => Promise<void>
+  foods: Food[],
+  editingFood: Food,
+  setEditingFood: (food: Food) => void
+  handleAddFood: (newFood: FoodInput) => Promise<void>,
+  handleUpdateFood: (food: Food) => Promise<void>,
+  handleDeleteFood: (id: number ) => Promise<void>
 }
 
 // The provider property will make the context available for other components 
 const FoodsContext = createContext<FoodsContextData>(
-    {} as FoodsContextData
+  {} as FoodsContextData
 )
 
 export function FoodsProvider({ children }: FoodProviderProps){
-    const [foods, setFoods] = useState<Food[]>([])
-    const [editingFood, setEditingFood] = useState({} as Food)
+  const [foods, setFoods] = useState<Food[]>([])
+  const [editingFood, setEditingFood] = useState({} as Food)
 
-    useEffect(() =>  {
-        async function loadFoods() {
-            let response = await api.get<Food[]>('/foods')
-                                    .then(response => response.data)
-            setFoods(response)
-        }
-    
-        loadFoods();
-      }, []);
-
-    async function handleAddFood(newFood: FoodInput) {
-        try {
-            const response = await api.post('/foods', {
-                ...newFood,
-                available: true
-            })
-            
-            setFoods([
-                ...foods,
-                response.data
-            ])            
-        } catch(error) {
-            console.log(error);
-        }       
+  useEffect(() =>  {
+    async function loadFoods() {
+      let response = await api.get<Food[]>('/foods')
+                              .then(response => response.data)
+      setFoods(response)
     }
 
-    async function handleUpdateFood(food: Food) {
-        try {
-          const updatedFood = await api.put(
-            `/foods/${editingFood.id}`,
-            { ...editingFood, ...food },
-          );
-    
-          const updatedFoods = foods.map(f =>
-            f.id !== updatedFood.data.id ? f : updatedFood.data,
-          );
-    
-          setFoods(updatedFoods)
-        } catch (error) {
-          console.log(error);
-        }
-      }
+    loadFoods();
+    }, []);
 
-    async function handleDeleteFood(id: number) {    
-        await api.delete(`/foods/${id}`);
-        const foodsFiltered = foods.filter(food => food.id !== id);
-        setFoods(foodsFiltered)
-      }
+  async function handleAddFood(newFood: FoodInput) {
+    try {
+      const response = await api.post('/foods', {
+          ...newFood,
+          available: true
+      })
+        
+    setFoods([
+        ...foods,
+        response.data
+    ])            
+    } catch(error) {
+      console.log(error);
+    }       
+  }
 
-    return (
-        <FoodsContext.Provider 
-            value={ { foods, editingFood, setEditingFood, handleAddFood, 
-              handleUpdateFood, handleDeleteFood } }
-        >
-            {children}
-        </FoodsContext.Provider>
-    )
+  async function handleUpdateFood(food: Food) {
+    try {
+      const updatedFood = await api.put(
+        `/foods/${editingFood.id}`,
+        { ...editingFood, ...food },
+      );
+
+      const updatedFoods = foods.map(f =>
+        f.id !== updatedFood.data.id ? f : updatedFood.data,
+      );
+
+      setFoods(updatedFoods)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function handleDeleteFood(id: number) {    
+      await api.delete(`/foods/${id}`);
+      const foodsFiltered = foods.filter(food => food.id !== id);
+      setFoods(foodsFiltered)
+    }
+
+  return (
+    <FoodsContext.Provider 
+      value={ { foods, editingFood, setEditingFood, handleAddFood, 
+        handleUpdateFood, handleDeleteFood } }
+    >
+      {children}
+    </FoodsContext.Provider>
+)
 }
 
 export function useFoods() {
-    const context = useContext(FoodsContext)
-    return context
+  const context = useContext(FoodsContext)
+  return context
 }
